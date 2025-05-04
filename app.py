@@ -25,9 +25,10 @@ if archivo is not None:
         st.write(df[['Tramo']].drop_duplicates())
         
         # Procesar coordenadas (extraer Latitud y Longitud)
-        df[['Latitud', 'Longitud']] = df['Location'].str.split(',', expand=True)
-        df['Latitud'] = df['Latitud'].astype(float)
-        df['Longitud'] = df['Longitud'].astype(float)
+        df = df.rename(columns={'latitud_Y': 'Latitud', 'longitud_X': 'Longitud'})
+        df['Latitud'] = pd.to_numeric(df['Latitud'], errors='coerce')
+        df['Longitud'] = pd.to_numeric(df['Longitud'], errors='coerce')
+        df = df.dropna(subset=['Latitud', 'Longitud'])
 
         # Colores para los técnicos
         colores = ['red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen']
