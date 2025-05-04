@@ -17,9 +17,9 @@ colores = [
 
 # Diccionario para asociar imágenes a técnicos (puedes personalizar las rutas de las imágenes)
 tecnico_imagenes = {
-    'K1': 'https://example.com/tecnico1.jpg',
-    'K2': 'https://example.com/tecnico2.jpg',
-    'K3': 'https://example.com/tecnico3.jpg',
+    'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
+    'K2': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
+    'K3': 'https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9',
     # Agrega más técnicos e imágenes según necesites
 }
 
