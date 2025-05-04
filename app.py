@@ -4,7 +4,6 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
-import base64
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
@@ -15,11 +14,11 @@ colores = [
     'pink', 'lightblue', 'beige', 'gray', 'black'
 ]
 
-# Diccionario para asociar imágenes a técnicos (puedes personalizar las rutas de las imágenes)
+# Diccionario para asociar imágenes a técnicos usando Google Drive
 tecnico_imagenes = {
-    'K001': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',
-    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',
-    'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',
+    'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
+    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',  # Reemplaza con el ID correcto
+    'K3': 'https://drive.google.com/uc?export=view&id=ID_DE_OTRA_IMAGEN',  # Reemplaza con el ID correcto
     # Agrega más técnicos e imágenes según necesites
 }
 
