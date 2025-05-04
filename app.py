@@ -9,10 +9,7 @@ st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
 # Colores para técnicos
-colores = [
-    'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
-    'pink', 'lightblue', 'beige', 'gray', 'black'
-]
+
 
 # Diccionario para asociar imágenes a técnicos usando Google Drive
 tecnico_imagenes = {
@@ -44,9 +41,7 @@ if archivo:
             # Asignar tramo si está vacío
             df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-            # Colores únicos por técnico
-            tecnicos = df['CodigoTecnico'].unique()
-            color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
+           
 
             # Selección de tipo de agrupación
             agrupacion = st.radio(
@@ -93,7 +88,7 @@ if archivo:
                 <b>Ubicación:</b> {row.get('Location', '')}
                 """
 
-                color = color_map.get(row['CodigoTecnico'], 'gray')
+               
 
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
