@@ -21,7 +21,7 @@ emoji_por_tramo = {
     "08AM-12PM": "🕗",
     "12PM-16PM": "🕛",
     "16PM-20PM": "🕓",
-    "SIN_TRAMO": "❓"
+    "0": "❓"
 }
 if archivo:
     try:
