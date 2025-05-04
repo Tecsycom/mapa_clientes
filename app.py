@@ -9,12 +9,12 @@ import requests
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# Diccionario para asociar imágenes a técnicos
+# Diccionario para asociar imágenes a técnicos usando Jimdo
 tecnico_imagenes = {
-    	'K1': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
-    	'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',
-    	'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
-    	'K4': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i9c58900a6cbbe4e4/version/1746398817/image.png',
+    'K1': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
+    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',
+    'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
+    'K4': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i9c58900a6cbbe4e4/version/1746398817/image.png',
 	'K5': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ic08644f6b1a25134/version/1746398817/image.png',
 	'K6': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ie8564e470660430d/version/1746401498/image.png',
 	'K7': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ibebc9083af63990b/version/1746398817/image.png',
@@ -118,7 +118,6 @@ if archivo:
 
                 # Usar imagen como ícono del marcador
                 if imagen_url and row['CodigoTecnico'] != 'SIN_TECNICO' and is_valid_image_url(imagen_url):
-                    st.write(f"✅ Imagen cargada para {row['CodigoTecnico']}: {imagen_url}")
                     icon = folium.CustomIcon(
                         icon_image=imagen_url,
                         icon_size=(30, 30),  # Tamaño del ícono en el mapa
@@ -126,7 +125,6 @@ if archivo:
                         popup_anchor=(0, -15)  # Posición del popup respecto al ícono
                     )
                 else:
-                    st.warning(f"⚠️ No se pudo cargar la imagen para {row['CodigoTecnico']}. Usando ícono por defecto.")
                     icon = folium.Icon(color='gray')
 
                 folium.Marker(
