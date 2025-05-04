@@ -6,18 +6,12 @@ from streamlit_folium import st_folium
 import os
 
 st.set_page_config(layout="wide")
-st.title("📍 Mapa de Clientes Tecsycom PeruFibra")
-
-# Colores para técnicos
-colores = [
-    'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
-    'pink', 'lightblue', 'beige', 'gray', 'black'
-]
+st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
 # Diccionario para asociar imágenes a técnicos usando Google Drive
 tecnico_imagenes = {
-       	 	'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
-	    	'K2 DANIEL COLMENAREZ': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
+    'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
+	        'K2': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
         	'K3': 'https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9',
 		'K4': 'https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ',
 		'K5': 'https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3',
@@ -67,9 +61,11 @@ if archivo:
             # Asignar tramo si está vacío
             df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-            # Colores únicos por técnico
-            tecnicos = df['CodigoTecnico'].unique()
-            color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
+            # Crear mapa
+            lat_mean = df['Latitud'].mean()
+            lon_mean = df['Longitud'].mean()
+            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
+            Fullscreen().add_to(mapa)
 
             # Selección de tipo de agrupación
             agrupacion = st.radio(
@@ -78,12 +74,6 @@ if archivo:
                 horizontal=True
             )
 
-            # Crear mapa
-            lat_mean = df['Latitud'].mean()
-            lon_mean = df['Longitud'].mean()
-            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
-            Fullscreen().add_to(mapa)
-
             if agrupacion == "Por Tramo":
                 # Crear grupos por tramo
                 tramos_unicos = df['Tramo'].unique()
@@ -91,6 +81,7 @@ if archivo:
                 grupo_key = 'Tramo'
             else:
                 # Crear grupos por técnico
+                tecnicos = df['CodigoTecnico'].unique()
                 grupos = {tec: folium.FeatureGroup(name=f"👷 {tec}") for tec in tecnicos}
                 grupo_key = 'CodigoTecnico'
 
@@ -116,18 +107,29 @@ if archivo:
                 <b>Ubicación:</b> {row.get('Location', '')}
                 """
 
-                color = color_map.get(row['CodigoTecnico'], 'gray')
+                # Usar imagen de Google Drive como ícono del marcador
+                if imagen_url and row['CodigoTecnico'] != 'SIN_TECNICO':
+                    icon = folium.CustomIcon(
+                        icon_image=imagen_url,
+                        icon_size=(30, 30),  # Tamaño del ícono en el mapa
+                        icon_anchor=(15, 15),  # Punto de anclaje del ícono (centro)
+                        popup_anchor=(0, -15)  # Posición del popup respecto al ícono
+                    )
+                else:
+                    # Ícono por defecto si no hay imagen o es SIN_TECNICO
+                    icon = folium.Icon(color='gray')
 
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
                     popup=folium.Popup(popup_text, max_width=300),
-                    icon=folium.Icon(color=color)
+                    icon=icon
                 ).add_to(grupo)
 
+                # Agregar etiqueta con el código del técnico
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
                     icon=folium.DivIcon(
-                        html=f"""<div style='font-size: 10pt; color:{color};
+                        html=f"""<div style='font-size: 10pt; color:black;
                                 background-color:white; padding:2px; border-radius:3px;'>
                                 <b>{row['CodigoTecnico']}</b></div>"""
                     )
