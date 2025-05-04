@@ -6,7 +6,7 @@ from streamlit_folium import st_folium
 import os
 
 st.set_page_config(layout="wide")
-st.title("📍 Mapa de Clientes por Técnico y Tramo")
+st.title("📍 Mapa de Clientes Tecsycom PeruFibra")
 
 # Colores para técnicos
 colores = [
