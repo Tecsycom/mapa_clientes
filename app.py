@@ -1,100 +1,95 @@
+import streamlit as st
 import pandas as pd
 import folium
-import streamlit as st
+from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
 
-# Título y descripción de la app
-st.title("Mapa de Clientes por Técnico y Tramo")
-st.write("Carga tu archivo Excel y visualiza las ubicaciones en el mapa")
+st.set_page_config(layout="wide")
+st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# Botón para cargar el archivo Excel
-archivo = st.file_uploader("📂 Selecciona tu archivo Excel", type=["xlsx", "xls"])
+# Colores para técnicos
+colores = [
+    'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
+    'pink', 'lightblue', 'beige', 'gray', 'black'
+]
 
-# --- Si se carga un archivo, procesarlo y mostrar el mapa ---
-if archivo is not None:
-    # Leer el archivo Excel
-    df = pd.read_excel(archivo)
+archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
-    # Verificar que el archivo tiene las columnas necesarias
-    columnas_necesarias = ['Location', 'Tecnico', 'Tramo']
-    if not all(col in df.columns for col in columnas_necesarias):
-        st.error(f"❌ El archivo debe tener las columnas: {', '.join(columnas_necesarias)}")
-    else:
-        # Procesar coordenadas (extraer Latitud y Longitud)
-        df[['Latitud', 'Longitud']] = df['Location'].str.split(',', expand=True)
-        df['Latitud'] = df['Latitud'].astype(float)
-        df['Longitud'] = df['Longitud'].astype(float)
+if archivo:
+    try:
+        df = pd.read_excel(archivo)
 
-        # Colores para los técnicos
-        colores = ['red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen']
-        df['CodigoTecnico'] = df['Tecnico'].str.extract(r'(K\d+)')
+        # Validación de columnas
+        columnas_requeridas = ['latitud_Y', 'longitud_X', 'Tramo', 'Tecnico', 'Location']
+        if not all(col in df.columns for col in columnas_requeridas):
+            st.error(f"❌ El archivo debe contener las columnas: {', '.join(columnas_requeridas)}")
+        else:
+            # Asignar latitud y longitud
+            df['Latitud'] = df['latitud_Y'].astype(float)
+            df['Longitud'] = df['longitud_X'].astype(float)
 
-        # Crear mapa
-        lat_mean = df['Latitud'].mean()
-        lon_mean = df['Longitud'].mean()
-        mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
+            # Extraer código de técnico, si existe
+            df['CodigoTecnico'] = df['Tecnico'].fillna('SIN_TECNICO').str.extract(r'(K\d+)')
+            df['CodigoTecnico'].fillna('SIN_TECNICO', inplace=True)
+            
+            # Asignar tramo si está vacío
+            df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-        # Agrupar por tramo
-        tramos = {
-            '08AM-12PM': folium.FeatureGroup(name='Tramo 1: 08AM-12PM', show=True),
-            '12PM-16PM': folium.FeatureGroup(name='Tramo 2: 12PM-16PM', show=True),
-            '16PM-20PM': folium.FeatureGroup(name='Tramo 3: 16PM-20PM', show=True)
-        }
+            # Colores únicos por técnico
+            tecnicos = df['CodigoTecnico'].unique()
+            color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
 
-        tecnicos = df['CodigoTecnico'].unique()
-        color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
+            # Crear mapa
+            lat_mean = df['Latitud'].mean()
+            lon_mean = df['Longitud'].mean()
+            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
+            Fullscreen().add_to(mapa)
 
-        # Añadir marcadores al mapa
-        for _, row in df.iterrows():
-            tramo = row['Tramo']
-            capa = tramos.get(tramo)
-            if not capa:
-                continue
+            # Crear grupos por tramo
+            tramos_unicos = df['Tramo'].unique()
+            grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
 
-            popup_text = f"""
-            <b>Código:</b> {row['Codigo']}<br>
-            <b>Cliente:</b> {row['Cliente']}<br>
-            <b>Dirección:</b> {row['Direccion']}<br>
-            <b>Distrito:</b> {row['Distrito']}<br>
-            <b>Negocio:</b> {row['Negocio']}<br>
-            <b>Estado:</b> {row['Estado']}<br>
-            <b>Observaciones:</b> {row['Observaciones']}<br>
-            <b>Tramo:</b> {row['Tramo']}<br>
-            <b>Técnico:</b> {row['Tecnico']}
-            """
-            folium.Marker(
-                location=[row['Latitud'], row['Longitud']],
-                popup=folium.Popup(popup_text, max_width=300),
-                icon=folium.Icon(color=color_map.get(row['CodigoTecnico'], 'gray'))
-            ).add_to(capa)
+            for _, row in df.iterrows():
+                tramo = row['Tramo']
+                grupo = grupos_tramos[tramo]
+                
+                popup_text = f"""
+                <b>Código:</b> {row.get('Codigo', '')}<br>
+                <b>Cliente:</b> {row.get('Cliente', '')}<br>
+                <b>Dirección:</b> {row.get('Direccion', '')}<br>
+                <b>Distrito:</b> {row.get('Distrito', '')}<br>
+                <b>Negocio:</b> {row.get('Negocio', '')}<br>
+                <b>Estado:</b> {row.get('Estado', '')}<br>
+                <b>Observaciones:</b> {row.get('Observaciones', '')}<br>
+                <b>Tramo:</b> {row.get('Tramo', '')}<br>
+                <b>Técnico:</b> {row.get('Tecnico', '')}
+                """
 
-            # Marcadores con iniciales del técnico
-            folium.Marker(
-                location=[row['Latitud'], row['Longitud']],
-                icon=folium.DivIcon(
-                    html=f"""<div style="font-size: 10pt; color:{color_map.get(row['CodigoTecnico'], 'black')};
-                            background-color:white; padding:2px; border-radius:3px;">
-                            <b>{row['CodigoTecnico']}</b>
-                            </div>"""
-                )
-            ).add_to(capa)
+                color = color_map.get(row['CodigoTecnico'], 'gray')
 
-        # Agregar capas al mapa
-        for capa in tramos.values():
-            mapa.add_child(capa)
+                folium.Marker(
+                    location=[row['Latitud'], row['Longitud']],
+                    popup=folium.Popup(popup_text, max_width=300),
+                    icon=folium.Icon(color=color)
+                ).add_to(grupo)
 
-        folium.LayerControl().add_to(mapa)
+                folium.Marker(
+                    location=[row['Latitud'], row['Longitud']],
+                    icon=folium.DivIcon(
+                        html=f"""<div style='font-size: 10pt; color:{color};
+                                background-color:white; padding:2px; border-radius:3px;'>
+                                <b>{row['CodigoTecnico']}</b></div>"""
+                    )
+                ).add_to(grupo)
 
-        # Mostrar mapa en Streamlit con un tamaño adecuado
-        st.subheader("🗺️ Mapa generado")
-        st_folium(mapa, width=1200, height=700)
+            # Agregar todos los grupos al mapa
+            for capa in grupos_tramos.values():
+                mapa.add_child(capa)
 
-        # Mensaje de éxito
-        st.success("✅ Mapa generado correctamente")
+            folium.LayerControl(collapsed=False).add_to(mapa)
 
-        # Opcional: guardar el mapa en la carpeta de Descargas
-        ruta_descargas = os.path.join(os.path.expanduser("~"), "Downloads")
-        archivo_salida = os.path.join(ruta_descargas, "mapa_tramos_tecnicos.html")
-        mapa.save(archivo_salida)
-        st.write(f"El mapa se ha guardado en: {archivo_salida}")
+            st_folium(mapa, width=1500, height=800)
+
+    except Exception as e:
+        st.error(f"Error al procesar el archivo: {e}")
