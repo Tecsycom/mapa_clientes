@@ -60,7 +60,7 @@ if archivo:
                 <b>Dirección:</b> {row.get('Direccion', '')}<br>
                 <b>Distrito:</b> {row.get('Distrito', '')}<br>
                 <b>Negocio:</b> {row.get('Negocio', '')}<br>
-                <b>Estado:</b> {row.get('Estado', '')}<br>
+                <b>Estado:</b> {row.get('Estado2', '')}<br>
                 <b>Observaciones:</b> {row.get('Observaciones', '')}<br>
                 <b>Tramo:</b> {row.get('Tramo', '')}<br>
                 <b>Técnico:</b> {row.get('Tecnico', '')}
