@@ -4,13 +4,14 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
+import requests
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# Diccionario para asociar imágenes a técnicos usando Google Drive
+# Diccionario para asociar imágenes a técnicos usando URLs directas (ejemplo con Imgur)
 tecnico_imagenes = {
-    'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
+'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
 	        'K2': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
         	'K3': 'https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9',
 		'K4': 'https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ',
@@ -38,6 +39,17 @@ tecnico_imagenes = {
 		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ',
     # Agrega más técnicos e imágenes según necesites
 }
+
+# Ícono por defecto si no hay imagen o falla la carga
+DEFAULT_ICON_URL = 'https://i.imgur.com/default_icon.png'  # Reemplaza con un enlace a un ícono genérico
+
+def is_valid_image_url(url):
+    """Verifica si la URL de la imagen es válida y accesible."""
+    try:
+        response = requests.head(url, timeout=5)
+        return response.status_code == 200 and 'image' in response.headers.get('Content-Type', '')
+    except:
+        return False
 
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
@@ -107,8 +119,8 @@ if archivo:
                 <b>Ubicación:</b> {row.get('Location', '')}
                 """
 
-                # Usar imagen de Google Drive como ícono del marcador
-                if imagen_url and row['CodigoTecnico'] != 'SIN_TECNICO':
+                # Usar imagen como ícono del marcador
+                if imagen_url and row['CodigoTecnico'] != 'SIN_TECNICO' and is_valid_image_url(imagen_url):
                     icon = folium.CustomIcon(
                         icon_image=imagen_url,
                         icon_size=(30, 30),  # Tamaño del ícono en el mapa
@@ -116,8 +128,16 @@ if archivo:
                         popup_anchor=(0, -15)  # Posición del popup respecto al ícono
                     )
                 else:
-                    # Ícono por defecto si no hay imagen o es SIN_TECNICO
-                    icon = folium.Icon(color='gray')
+                    # Ícono por defecto si no hay imagen, es SIN_TECNICO, o la URL no es válida
+                    if is_valid_image_url(DEFAULT_ICON_URL):
+                        icon = folium.CustomIcon(
+                            icon_image=DEFAULT_ICON_URL,
+                            icon_size=(30, 30),
+                            icon_anchor=(15, 15),
+                            popup_anchor=(0, -15)
+                        )
+                    else:
+                        icon = folium.Icon(color='gray')
 
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
