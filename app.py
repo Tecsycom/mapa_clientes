@@ -86,9 +86,9 @@ if archivo is not None:
 
         folium.LayerControl().add_to(mapa)
 
-        # Mostrar mapa en Streamlit
+        # Mostrar mapa en Streamlit con un tamaño adecuado
         st.subheader("🗺️ Mapa generado")
-        st_folium(mapa, width=1200, height=600)
+        st_folium(mapa, width=1200, height=700)
 
         # Mensaje de éxito
         st.success("✅ Mapa generado correctamente")
