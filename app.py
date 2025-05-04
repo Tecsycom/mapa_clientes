@@ -36,7 +36,7 @@ tecnico_imagenes = {
 		'K23': 'https://drive.google.com/uc?export=view&id=1V6Mu5TFlhO2ksN4QCBvLNwg1VeCKLyzQ',
 		'K24': 'https://drive.google.com/uc?export=view&id=1sq5AItRn3v3QABsjuzWOu1sz1fCVtL3_',
 		'K25': 'https://drive.google.com/uc?export=view&id=1fLHo53ShJckct5103myJK0R3MSmeo7wD',
-		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ',
+		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ'
     # Agrega más técnicos e imágenes según necesites
 }
 
