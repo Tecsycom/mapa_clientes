@@ -12,7 +12,7 @@ st.title("📍 Mapa de Clientes por Técnico y Tramo")
 # Diccionario para asociar imágenes a técnicos usando URLs directas (ejemplo con Imgur)
 tecnico_imagenes = {
 'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
-	        'K2': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
+	        'K2': 'https://i.imgur.com/zYxDCtc.png',
         	'K3': 'https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9',
 		'K4': 'https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ',
 		'K5': 'https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3',
@@ -36,7 +36,7 @@ tecnico_imagenes = {
 		'K23': 'https://drive.google.com/uc?export=view&id=1V6Mu5TFlhO2ksN4QCBvLNwg1VeCKLyzQ',
 		'K24': 'https://drive.google.com/uc?export=view&id=1sq5AItRn3v3QABsjuzWOu1sz1fCVtL3_',
 		'K25': 'https://drive.google.com/uc?export=view&id=1fLHo53ShJckct5103myJK0R3MSmeo7wD',
-		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ'
+		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ',
     # Agrega más técnicos e imágenes según necesites
 }
 
