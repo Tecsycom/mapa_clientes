@@ -11,7 +11,7 @@ st.title("📍 Mapa de Clientes por Técnico y Tramo")
 # Diccionario para asociar imágenes a técnicos usando Google Drive
 tecnico_imagenes = {
     'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
-	        'K2 DANIEL COLMENAREZ': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
+	        'K2': 'https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53',
         	'K3': 'https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9',
 		'K4': 'https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ',
 		'K5': 'https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3',
