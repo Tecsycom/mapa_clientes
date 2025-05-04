@@ -4,6 +4,7 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
+import base64
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
@@ -13,6 +14,14 @@ colores = [
     'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
     'pink', 'lightblue', 'beige', 'gray', 'black'
 ]
+
+# Diccionario para asociar imágenes a técnicos (puedes personalizar las rutas de las imágenes)
+tecnico_imagenes = {
+    'K1': 'https://example.com/tecnico1.jpg',
+    'K2': 'https://example.com/tecnico2.jpg',
+    'K3': 'https://example.com/tecnico3.jpg',
+    # Agrega más técnicos e imágenes según necesites
+}
 
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
@@ -40,21 +49,39 @@ if archivo:
             tecnicos = df['CodigoTecnico'].unique()
             color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
 
+            # Selección de tipo de agrupación
+            agrupacion = st.radio(
+                "📊 Selecciona el tipo de agrupación:",
+                ["Por Tramo", "Por Técnico"],
+                horizontal=True
+            )
+
             # Crear mapa
             lat_mean = df['Latitud'].mean()
             lon_mean = df['Longitud'].mean()
             mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
             Fullscreen().add_to(mapa)
 
-            # Crear grupos por tramo
-            tramos_unicos = df['Tramo'].unique()
-            grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
+            if agrupacion == "Por Tramo":
+                # Crear grupos por tramo
+                tramos_unicos = df['Tramo'].unique()
+                grupos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
+                grupo_key = 'Tramo'
+            else:
+                # Crear grupos por técnico
+                grupos = {tec: folium.FeatureGroup(name=f"👷 {tec}") for tec in tecnicos}
+                grupo_key = 'CodigoTecnico'
 
             for _, row in df.iterrows():
-                tramo = row['Tramo']
-                grupo = grupos_tramos[tramo]
+                key = row[grupo_key]
+                grupo = grupos[key]
                 
+                # Obtener imagen del técnico si existe
+                imagen_url = tecnico_imagenes.get(row['CodigoTecnico'], '')
+                imagen_html = f'<img src="{imagen_url}" width="100" height="100" style="border-radius: 10px;"><br>' if imagen_url else ''
+
                 popup_text = f"""
+                {imagen_html}
                 <b>Código:</b> {row.get('Codigo', '')}<br>
                 <b>Cliente:</b> {row.get('Cliente', '')}<br>
                 <b>Dirección:</b> {row.get('Direccion', '')}<br>
@@ -63,7 +90,8 @@ if archivo:
                 <b>Estado:</b> {row.get('Estado', '')}<br>
                 <b>Observaciones:</b> {row.get('Observaciones', '')}<br>
                 <b>Tramo:</b> {row.get('Tramo', '')}<br>
-                <b>Técnico:</b> {row.get('Tecnico', '')}
+                <b>Técnico:</b> {row.get('Tecnico', '')}<br>
+                <b>Ubicación:</b> {row.get('Location', '')}
                 """
 
                 color = color_map.get(row['CodigoTecnico'], 'gray')
@@ -84,7 +112,7 @@ if archivo:
                 ).add_to(grupo)
 
             # Agregar todos los grupos al mapa
-            for capa in grupos_tramos.values():
+            for capa in grupos.values():
                 mapa.add_child(capa)
 
             folium.LayerControl(collapsed=False).add_to(mapa)
