@@ -11,32 +11,32 @@ st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
 # Diccionario para asociar imágenes a técnicos
 tecnico_imagenes = {
-    'K1': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
-    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',
-    'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
-    'K4': 'https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ',
-		'K5': 'https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3',
-		'K6': 'https://drive.google.com/uc?export=view&id=18ADh7OZ5py9laTnr0k0B6pGw5XIA8Nwk',
-		'K7': 'https://drive.google.com/uc?export=view&id=1kUv6F03Zp63O6fwqBzxwdZpPb4v5XzeQ',
-		'K8': 'https://drive.google.com/uc?export=view&id=1eEBDlMeENLECMt1vepJzE3E6Zqty-MYE',
-		'K9': 'https://drive.google.com/uc?export=view&id=1abcpovvhPpntk6kNPs5TLYquUvQq3q3j',
-		'K10': 'https://drive.google.com/uc?export=view&id=1HrmnkZ7l2NpnQAxHW7b8MeUelvm00qWL',
-		'K11': 'https://drive.google.com/uc?export=view&id=1kamN6mL1gwt2BL0JgUakZTExo626WMEr',
-		'K12': 'https://drive.google.com/uc?export=view&id=16Ii9V3XHatErez-NRsn-qxC42feEb7zb',
-		'K13': 'https://drive.google.com/uc?export=view&id=1K0LAqdYddDee_vMJ-nEeY8p39gWuE8jc',
-		'K14': 'https://drive.google.com/uc?export=view&id=1CGp7w8-LO7qusd57WdndTW0wFQil6zMy',
-		'K15': 'https://drive.google.com/uc?export=view&id=10pPTQ34Ax1i9-FrHnq0ThExW5LkqZara',
-		'K16': 'https://drive.google.com/uc?export=view&id=16SITfKok6hAuVdKVZvYDCYINAOYTv-EN',
-		'K17': 'https://drive.google.com/uc?export=view&id=1Mq1pZic4mapegl8WYVTirx1Vx_7-POQS',
-		'K18': 'https://drive.google.com/uc?export=view&id=1iQ5tpHYi_lbo0MTszxIG4wkLiSfrtEqF',
-		'K19': 'https://drive.google.com/uc?export=view&id=1jliqrwLx-wRn_jExnKWm-LviYlUTP5EV',
-		'K20': 'https://drive.google.com/uc?export=view&id=1pi6GeHkJyz0IFv5IEGGWH6d-TPVCKQPq',
-		'K21': 'https://drive.google.com/uc?export=view&id=15N6YoK4vXjuxqUGKxSnJYIG0Guj0uUUk',
-		'K22': 'https://drive.google.com/uc?export=view&id=1xzvpe-YxM5N2Y1CyxFPNfizNELQrKLMT',
-		'K23': 'https://drive.google.com/uc?export=view&id=1V6Mu5TFlhO2ksN4QCBvLNwg1VeCKLyzQ',
-		'K24': 'https://drive.google.com/uc?export=view&id=1sq5AItRn3v3QABsjuzWOu1sz1fCVtL3_',
-		'K25': 'https://drive.google.com/uc?export=view&id=1fLHo53ShJckct5103myJK0R3MSmeo7wD',
-		'K26': 'https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ',
+    	'K1': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
+    	'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',
+    	'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
+    	'K4': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i9c58900a6cbbe4e4/version/1746398817/image.png',
+	'K5': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ic08644f6b1a25134/version/1746398817/image.png',
+	'K6': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ie8564e470660430d/version/1746401498/image.png',
+	'K7': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ibebc9083af63990b/version/1746398817/image.png',
+	'K8': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ifebee64e613bdea0/version/1746398817/image.png',
+	'K9': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i58a6e61a4783a1eb/version/1746398817/image.png',
+	'K10': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i48e986e631933c3f/version/1746398817/image.png',
+	'K11': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ib06a5828cc072b3d/version/1746398817/image.png',
+	'K12': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i218d3ce8195e7994/version/1746398817/image.png',
+	'K13': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/id7a1c4b7867542dc/version/1746398817/image.png',
+	'K14': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i1a66ce73e6284876/version/1746398818/image.png',
+	'K15': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i0f974406e94fcfe7/version/1746398818/image.png',
+	'K16': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i08212dcf7a94ec8d/version/1746398818/image.png',
+	'K17': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ia962840892943571/version/1746398818/image.png',
+	'K18': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i25e1788c21593e17/version/1746398818/image.png',
+	'K19': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i332f827167971787/version/1746398818/image.png',
+	'K20': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i5639ff4ca3689021/version/1746401775/image.png',
+	'K21': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i4431b80025c7cb0b/version/1746401775/image.png',
+	'K22': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i78169bc289f9bb16/version/1746401775/image.png',
+	'K23': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i72747b666a54435a/version/1746401498/image.png',
+	'K24': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i14c4e9f66122db79/version/1746401775/image.png',
+	'K25': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i5b8685a3dfa3c887/version/1746401775/image.png',
+	'K26': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/i00783c0365de577b/version/1746401775/image.png',
     # Agrega más técnicos e imágenes según necesites
 }
 
