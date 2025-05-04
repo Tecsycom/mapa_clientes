@@ -55,8 +55,10 @@ if archivo:
 
             # Crear grupos por tramo
             tramos_unicos = df['Tramo'].unique()
-            #grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
+            grupos_tramos = {
             tramo: folium.FeatureGroup(name=f"{emoji_por_tramo.get(tramo, '📌')} {tramo}")
+            for tramo in tramos_unicos
+            }
             for _, row in df.iterrows():
                 tramo = row['Tramo']
                 grupo = grupos_tramos[tramo]
