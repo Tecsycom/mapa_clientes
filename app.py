@@ -10,9 +10,9 @@ st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
 # Íconos personalizados por técnico (puedes añadir más Kx si lo necesitas)
 iconos_tecnicos = {
-    "K1": "https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5",
-    "K2": "https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53",
-    "K3": "https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9",
+    	"K1 JESUS MORENO": "https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5",
+    	"K2 DANIEL COLMENAREZ": "https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53",
+    	"K3": "https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9",
 	"K4": "https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ",
 	"K5": "https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3",
 	"K6": "https://drive.google.com/uc?export=view&id=18ADh7OZ5py9laTnr0k0B6pGw5XIA8Nwk",
