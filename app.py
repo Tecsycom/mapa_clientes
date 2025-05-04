@@ -4,58 +4,23 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
-import requests
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# Diccionario para asociar imágenes a técnicos usando Cloudinary
+# Colores para técnicos
+colores = [
+    'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
+    'pink', 'lightblue', 'beige', 'gray', 'black'
+]
+
+# Diccionario para asociar imágenes a técnicos usando Google Drive
 tecnico_imagenes = {
-    'K1': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/if93daac84054c671/version/1746398817/image.png',  # Reemplaza con tu URL de Cloudinary
-    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',  # Reemplaza con tu URL
-    'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL
+    'K1': 'https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5',
+    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',  # Reemplaza con el ID correcto
+    'K3': 'https://drive.google.com/uc?export=view&id=ID_DE_OTRA_IMAGEN',  # Reemplaza con el ID correcto
     # Agrega más técnicos e imágenes según necesites
 }
-
-# Ruta para imágenes locales (opcional, si las tienes localmente)
-LOCAL_IMAGES_PATH = 'imagenes/'
-
-def is_valid_image_url(url):
-    """Verifica si la URL de la imagen es válida y accesible."""
-    try:
-        response = requests.head(url, timeout=5)
-        return response.status_code == 200 and 'image' in response.headers.get('Content-Type', '')
-    except:
-        return False
-
-def get_icon_image(codigo_tecnico):
-    """Obtiene la imagen para el técnico, primero desde URL, luego desde local, o usa ícono por defecto."""
-    imagen_url = tecnico_imagenes.get(codigo_tecnico, '')
-    
-    # Intentar con URL de Cloudinary
-    if imagen_url and is_valid_image_url(imagen_url):
-        st.write(f"✅ Imagen cargada para {codigo_tecnico}: {imagen_url}")
-        return folium.CustomIcon(
-            icon_image=imagen_url,
-            icon_size=(30, 30),
-            icon_anchor=(15, 15),
-            popup_anchor=(0, -15)
-        )
-    
-    # Intentar con imagen local
-    local_image_path = os.path.join(LOCAL_IMAGES_PATH, f"{codigo_tecnico}.png")
-    if os.path.exists(local_image_path):
-        st.write(f"✅ Imagen local encontrada para {codigo_tecnico}: {local_image_path}")
-        return folium.CustomIcon(
-            icon_image=local_image_path,
-            icon_size=(30, 30),
-            icon_anchor=(15, 15),
-            popup_anchor=(0, -15)
-        )
-    
-    # Usar ícono por defecto de Folium
-    st.warning(f"⚠️ No se encontró imagen para {codigo_tecnico}. Usando ícono por defecto.")
-    return folium.Icon(color='gray')
 
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
@@ -79,11 +44,9 @@ if archivo:
             # Asignar tramo si está vacío
             df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-            # Crear mapa
-            lat_mean = df['Latitud'].mean()
-            lon_mean = df['Longitud'].mean()
-            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
-            Fullscreen().add_to(mapa)
+            # Colores únicos por técnico
+            tecnicos = df['CodigoTecnico'].unique()
+            color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
 
             # Selección de tipo de agrupación
             agrupacion = st.radio(
@@ -92,6 +55,12 @@ if archivo:
                 horizontal=True
             )
 
+            # Crear mapa
+            lat_mean = df['Latitud'].mean()
+            lon_mean = df['Longitud'].mean()
+            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
+            Fullscreen().add_to(mapa)
+
             if agrupacion == "Por Tramo":
                 # Crear grupos por tramo
                 tramos_unicos = df['Tramo'].unique()
@@ -99,7 +68,6 @@ if archivo:
                 grupo_key = 'Tramo'
             else:
                 # Crear grupos por técnico
-                tecnicos = df['CodigoTecnico'].unique()
                 grupos = {tec: folium.FeatureGroup(name=f"👷 {tec}") for tec in tecnicos}
                 grupo_key = 'CodigoTecnico'
 
@@ -125,20 +93,18 @@ if archivo:
                 <b>Ubicación:</b> {row.get('Location', '')}
                 """
 
-                # Obtener ícono para el marcador
-                icon = get_icon_image(row['CodigoTecnico'])
+                color = color_map.get(row['CodigoTecnico'], 'gray')
 
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
                     popup=folium.Popup(popup_text, max_width=300),
-                    icon=icon
+                    icon=folium.Icon(color=color)
                 ).add_to(grupo)
 
-                # Agregar etiqueta con el código del técnico
                 folium.Marker(
                     location=[row['Latitud'], row['Longitud']],
                     icon=folium.DivIcon(
-                        html=f"""<div style='font-size: 10pt; color:black;
+                        html=f"""<div style='font-size: 10pt; color:{color};
                                 background-color:white; padding:2px; border-radius:3px;'>
                                 <b>{row['CodigoTecnico']}</b></div>"""
                     )
