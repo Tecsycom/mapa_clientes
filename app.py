@@ -12,8 +12,8 @@ st.title("📍 Mapa de Clientes por Técnico y Tramo")
 # Diccionario para asociar imágenes a técnicos usando Cloudinary
 tecnico_imagenes = {
     'K1': 'https://res.cloudinary.com/tu-nombre-de-cloud/image/upload/v1/tecnico_k1.png',  # Reemplaza con tu URL de Cloudinary
-    'K2': 'https://i.imgur.com/zYxDCtc.png',  # Reemplaza con tu URL
-    'K3': 'https://res.cloudinary.com/tu-nombre-de-cloud/image/upload/v1/tecnico_k3.png',  # Reemplaza con tu URL
+    'K2': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/iccda9cb82229f3a9/version/1746398817/image.png',  # Reemplaza con tu URL
+    'K3': 'https://image.jimcdn.com/app/cms/image/transf/none/path/sa3d970c4958873be/image/ica5337bd931d58f9/version/1746398817/image.png',  # Reemplaza con tu URL
     # Agrega más técnicos e imágenes según necesites
 }
 
