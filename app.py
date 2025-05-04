@@ -6,40 +6,30 @@ from folium.plugins import MarkerCluster
 from folium.features import CustomIcon
 from streamlit_folium import st_folium
 
-# Configuración de página
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# Cargar archivo Excel
 archivo = st.file_uploader("📂 Sube tu archivo Excel", type=["xlsx"])
 
 if archivo:
     df = pd.read_excel(archivo)
 
-    # Validar columnas necesarias
     columnas_requeridas = ['Codigo', 'Cliente', 'Direccion', 'Distrito', 'Negocio', 'Estado',
                            'Observaciones', 'Tramo', 'Tecnico', 'Location']
     if not all(col in df.columns for col in columnas_requeridas):
         st.error("❌ El archivo debe tener todas las columnas requeridas.")
         st.stop()
 
-    # Filtrar filas con coordenadas válidas
-    df = df[df['Location'].str.contains(",", na=False)]
-
     # Procesar coordenadas
-    df[['Latitud', 'Longitud']] = df['Location'].astype(str).str.split(',', expand=True)
+    df[['Latitud', 'Longitud']] = df['Location'].astype(str).str.strip().str.split(',', expand=True)
     df['Latitud'] = pd.to_numeric(df['Latitud'], errors='coerce')
     df['Longitud'] = pd.to_numeric(df['Longitud'], errors='coerce')
     df = df.dropna(subset=['Latitud', 'Longitud'])
 
-    # Normalizar valores nulos
     df['Tramo'] = df['Tramo'].fillna("SIN TRAMO")
     df['Tecnico'] = df['Tecnico'].fillna("SIN TECNICO")
     df['CodigoTecnico'] = df['Tecnico'].str.extract(r'(K\d+)')
     df['CodigoTecnico'] = df['CodigoTecnico'].fillna("SIN")
-
-    # Mostrar cantidad de registros leídos
-    st.write(f"📊 Registros cargados: {len(df)}")
 
     # Emojis para tramos
     emoji_tramos = {
@@ -49,11 +39,11 @@ if archivo:
         "SIN TRAMO": "❓"
     }
 
-    # Íconos personalizados por técnico (usa algunos como ejemplo)
+    # Íconos personalizados para técnicos
     iconos_por_tecnico = {
-       		"K1": "https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5",
-        	"K2": "https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53",
-        	"K3": "https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9",
+        "K1": "https://drive.google.com/uc?export=view&id=1NpNDjygRb6gZwxPBuyDaT2_hAeThcdv5",
+        "K2": "https://drive.google.com/uc?export=view&id=1AS1snf4F4yCONF9BN2vmTmjGC5vaRk53",
+        "K3": "https://drive.google.com/uc?export=view&id=1Ghw1iA0TfYX5naSz1b2mkPlfuNJjTUM9",
 		"K4": "https://drive.google.com/uc?export=view&id=1F9vESvpGljaTcEqqEqQoqRB_JSVCbaUZ",
 		"K5": "https://drive.google.com/uc?export=view&id=1BnsJeMSjEbRJ8vX_52XgBkwxBgJ4wtJ3",
 		"K6": "https://drive.google.com/uc?export=view&id=18ADh7OZ5py9laTnr0k0B6pGw5XIA8Nwk",
@@ -77,27 +67,23 @@ if archivo:
 		"K24": "https://drive.google.com/uc?export=view&id=1sq5AItRn3v3QABsjuzWOu1sz1fCVtL3_",
 		"K25": "https://drive.google.com/uc?export=view&id=1fLHo53ShJckct5103myJK0R3MSmeo7wD",
 		"K26": "https://drive.google.com/uc?export=view&id=1Piz7MDaSyhtVY0nWoxkV_X0lcLNtjnSQ",
-	    	"SIN": "https://cdn-icons-png.flaticon.com/512/149/149071.png"
-        
+        "SIN": "https://drive.google.com/uc?export=view&id=ID_ICONO_DEFAULT"
+        # Agrega más técnicos aquí...
     }
 
-    # Crear mapa base
     mapa = folium.Map(location=[df['Latitud'].mean(), df['Longitud'].mean()], zoom_start=13)
 
-    # Agrupar por tramos
     grupos_tramos = {}
     for tramo in df['Tramo'].unique():
         emoji = emoji_tramos.get(tramo, "📍")
         grupos_tramos[tramo] = FeatureGroup(name=f"{emoji} {tramo}")
         mapa.add_child(grupos_tramos[tramo])
 
-    # Agrupar por técnicos
     grupos_tecnicos = {}
     for codigo in df['CodigoTecnico'].unique():
         grupos_tecnicos[codigo] = FeatureGroup(name=f"🛠️ Técnico {codigo}", show=False)
         mapa.add_child(grupos_tecnicos[codigo])
 
-    # Agregar marcadores
     for _, row in df.iterrows():
         popup_text = f"""
         <b>Código:</b> {row['Codigo']}<br>
@@ -111,7 +97,6 @@ if archivo:
         <b>Técnico:</b> {row['Tecnico']}
         """
 
-        # Elegir ícono por técnico
         icon_url = iconos_por_tecnico.get(row['CodigoTecnico'], iconos_por_tecnico["SIN"])
         custom_icon = CustomIcon(icon_url, icon_size=(30, 30))
 
@@ -121,12 +106,8 @@ if archivo:
             icon=custom_icon
         )
 
-        # Agregar a grupo de tramo y técnico
-        grupos_tramos[row['Tramo']].add_child(marker)
-        grupos_tecnicos[row['CodigoTecnico']].add_child(marker)
+        grupos_tramos.get(row['Tramo'], grupos_tramos["SIN TRAMO"]).add_child(marker)
+        grupos_tecnicos.get(row['CodigoTecnico'], grupos_tecnicos["SIN"]).add_child(marker)
 
-    # Control de capas
     folium.LayerControl(collapsed=False).add_to(mapa)
-
-    # Mostrar mapa en Streamlit
     st_data = st_folium(mapa, width=1200, height=700)
