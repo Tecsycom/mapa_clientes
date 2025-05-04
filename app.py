@@ -1,100 +1,95 @@
 import streamlit as st
 import pandas as pd
 import folium
-from folium import FeatureGroup
-from folium.plugins import MarkerCluster
-from folium.features import CustomIcon
+from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
-import io
+import os
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes por Técnico y Tramo")
 
-# --- Subir archivo Excel ---
-archivo = st.file_uploader("📂 Sube tu archivo Excel", type=["xlsx"])
+# Colores para técnicos
+colores = [
+    'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
+    'pink', 'lightblue', 'beige', 'gray', 'black'
+]
+
+archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
 if archivo:
-    df = pd.read_excel(archivo)
+    try:
+        df = pd.read_excel(archivo)
 
-    # Validación de columnas
-    columnas_requeridas = ['Codigo', 'Cliente', 'Direccion', 'Distrito', 'Negocio', 'Estado',
-                           'Observaciones', 'Tramo', 'Tecnico', 'Location']
-    if not all(col in df.columns for col in columnas_requeridas):
-        st.error("❌ El archivo debe tener todas las columnas requeridas.")
-        st.stop()
+        # Validación de columnas
+        columnas_requeridas = ['latitud_Y', 'longitud_X', 'Tramo', 'Tecnico', 'Location']
+        if not all(col in df.columns for col in columnas_requeridas):
+            st.error(f"❌ El archivo debe contener las columnas: {', '.join(columnas_requeridas)}")
+        else:
+            # Asignar latitud y longitud
+            df['Latitud'] = df['latitud_Y'].astype(float)
+            df['Longitud'] = df['longitud_X'].astype(float)
 
-    # Procesar coordenadas
-    df[['Latitud', 'Longitud']] = df['Location'].astype(str).str.split(',', expand=True)
-    df['Latitud'] = df['Latitud'].astype(float)
-    df['Longitud'] = df['Longitud'].astype(float)
+            # Extraer código de técnico, si existe
+            df['CodigoTecnico'] = df['Tecnico'].fillna('SIN_TECNICO').str.extract(r'(K\d+)')
+            df['CodigoTecnico'].fillna('SIN_TECNICO', inplace=True)
+            
+            # Asignar tramo si está vacío
+            df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-    # Normalizar tramo y técnico
-    df['Tramo'] = df['Tramo'].fillna("SIN TRAMO")
-    df['Tecnico'] = df['Tecnico'].fillna("SIN TECNICO")
-    df['CodigoTecnico'] = df['Tecnico'].str.extract(r'(K\d+)')
-    df['CodigoTecnico'] = df['CodigoTecnico'].fillna("SIN")
+            # Colores únicos por técnico
+            tecnicos = df['CodigoTecnico'].unique()
+            color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
 
-    # Emojis para tramos
-    emoji_tramos = {
-        "08AM-12PM": "🌞",
-        "12PM-16PM": "🌤️",
-        "16PM-20PM": "🌙",
-        "SIN TRAMO": "❓"
-    }
+            # Crear mapa
+            lat_mean = df['Latitud'].mean()
+            lon_mean = df['Longitud'].mean()
+            mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
+            Fullscreen().add_to(mapa)
 
-    # Íconos personalizados para técnicos (ejemplo)
-    iconos_por_tecnico = {
-        "K1": "https://drive.google.com/uc?export=view&id=ID_ICONO_K1",
-        "K2": "https://drive.google.com/uc?export=view&id=ID_ICONO_K2",
-        "K3": "https://drive.google.com/uc?export=view&id=ID_ICONO_K3",
-        # Agrega el resto...
-        "SIN": "https://drive.google.com/uc?export=view&id=ID_ICONO_DEFAULT"
-    }
+            # Crear grupos por tramo
+            tramos_unicos = df['Tramo'].unique()
+            grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
 
-    # Crear mapa base
-    mapa = folium.Map(location=[df['Latitud'].mean(), df['Longitud'].mean()], zoom_start=13)
+            for _, row in df.iterrows():
+                tramo = row['Tramo']
+                grupo = grupos_tramos[tramo]
+                
+                popup_text = f"""
+                <b>Código:</b> {row.get('Codigo', '')}<br>
+                <b>Cliente:</b> {row.get('Cliente', '')}<br>
+                <b>Dirección:</b> {row.get('Direccion', '')}<br>
+                <b>Distrito:</b> {row.get('Distrito', '')}<br>
+                <b>Negocio:</b> {row.get('Negocio', '')}<br>
+                <b>Estado:</b> {row.get('Estado', '')}<br>
+                <b>Observaciones:</b> {row.get('Observaciones', '')}<br>
+                <b>Tramo:</b> {row.get('Tramo', '')}<br>
+                <b>Técnico:</b> {row.get('Tecnico', '')}
+                """
 
-    # --- Agrupar por tramos ---
-    grupos_tramos = {}
-    for tramo in df['Tramo'].unique():
-        emoji = emoji_tramos.get(tramo, "📍")
-        grupos_tramos[tramo] = FeatureGroup(name=f"{emoji} {tramo}")
-        mapa.add_child(grupos_tramos[tramo])
+                color = color_map.get(row['CodigoTecnico'], 'gray')
 
-    # --- Agrupar por técnico ---
-    grupos_tecnicos = {}
-    for codigo in df['CodigoTecnico'].unique():
-        grupos_tecnicos[codigo] = FeatureGroup(name=f"🛠️ Técnico {codigo}", show=False)
-        mapa.add_child(grupos_tecnicos[codigo])
+                folium.Marker(
+                    location=[row['Latitud'], row['Longitud']],
+                    popup=folium.Popup(popup_text, max_width=300),
+                    icon=folium.Icon(color=color)
+                ).add_to(grupo)
 
-    # --- Añadir marcadores ---
-    for _, row in df.iterrows():
-        popup_text = f"""
-        <b>Código:</b> {row['Codigo']}<br>
-        <b>Cliente:</b> {row['Cliente']}<br>
-        <b>Dirección:</b> {row['Direccion']}<br>
-        <b>Distrito:</b> {row['Distrito']}<br>
-        <b>Negocio:</b> {row['Negocio']}<br>
-        <b>Estado:</b> {row['Estado2']}<br>
-        <b>Observaciones:</b> {row['Observaciones']}<br>
-        <b>Tramo:</b> {row['Tramo']}<br>
-        <b>Técnico:</b> {row['Tecnico']}
-        """
+                folium.Marker(
+                    location=[row['Latitud'], row['Longitud']],
+                    icon=folium.DivIcon(
+                        html=f"""<div style='font-size: 10pt; color:{color};
+                                background-color:white; padding:2px; border-radius:3px;'>
+                                <b>{row['CodigoTecnico']}</b></div>"""
+                    )
+                ).add_to(grupo)
 
-        icon_url = iconos_por_tecnico.get(row['CodigoTecnico'], iconos_por_tecnico["SIN"])
-        custom_icon = CustomIcon(icon_url, icon_size=(30, 30))
+            # Agregar todos los grupos al mapa
+            for capa in grupos_tramos.values():
+                mapa.add_child(capa)
 
-        marker = folium.Marker(
-            location=[row['Latitud'], row['Longitud']],
-            popup=folium.Popup(popup_text, max_width=300),
-            icon=custom_icon
-        )
+            folium.LayerControl(collapsed=False).add_to(mapa)
 
-        # Añadir a grupos
-        grupos_tramos[row['Tramo']].add_child(marker)
-        grupos_tecnicos[row['CodigoTecnico']].add_child(marker)
+            st_folium(mapa, width=1500, height=800)
 
-    folium.LayerControl(collapsed=False).add_to(mapa)
-
-    # Mostrar mapa en Streamlit
-    st_data = st_folium(mapa, width=1200, height=700)
+    except Exception as e:
+        st.error(f"Error al procesar el archivo: {e}")
