@@ -16,6 +16,13 @@ colores = [
 
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
+# Emojis por tramo
+emoji_por_tramo = {
+    "08AM-12PM": "🕗",
+    "12PM-16PM": "🕛",
+    "16PM-20PM": "🕓",
+    "SIN_TRAMO": "❓"
+}
 if archivo:
     try:
         df = pd.read_excel(archivo)
@@ -48,8 +55,8 @@ if archivo:
 
             # Crear grupos por tramo
             tramos_unicos = df['Tramo'].unique()
-            grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
-
+            #grupos_tramos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
+            tramo: folium.FeatureGroup(name=f"{emoji_por_tramo.get(tramo, '📌')} {tramo}")
             for _, row in df.iterrows():
                 tramo = row['Tramo']
                 grupo = grupos_tramos[tramo]
