@@ -65,7 +65,7 @@ if archivo:
                 # Crear grupos por tramo con emojis de reloj
                 tramos_unicos = df['Tramo'].unique()
                 grupos = {
-                    tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '🕒')} {tramo}")
+                    tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '📍')} {tramo}")
                     for tramo in tramos_unicos
                 }
                 grupo_key = 'Tramo'
