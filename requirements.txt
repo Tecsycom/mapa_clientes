@@ -1,6 +1,9 @@
-streamlit
-pandas
-openpyxl
-folium
-streamlit-folium
-
+#streamlit
+#pandas
+#openpyxl
+#folium
+#streamlit-folium
+cd mapa_clientes
+git add app.py requirements.txt .gitignore
+git commit -m "Update app with Service Account and correct dependencies"
+git push origin main
