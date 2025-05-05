@@ -4,7 +4,6 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
-import base64
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes Tecsycom PeruFibra")
@@ -15,12 +14,12 @@ colores = [
     'pink', 'lightblue', 'beige', 'gray', 'black'
 ]
 
-# Diccionario para asociar imágenes a técnicos (puedes personalizar las rutas de las imágenes)
-tecnico_imagenes = {
-    'K001': 'https://example.com/tecnico1.jpg',
-    'K002': 'https://example.com/tecnico2.jpg',
-    'K003': 'https://example.com/tecnico3.jpg',
-    # Agrega más técnicos e imágenes según necesites
+# Diccionario para asociar emojis de reloj a tramos
+emoji_tramos = {
+    "08AM-12PM": "🕗",
+    "12PM-16PM": "🕛",
+    "16PM-20PM": "🕓",
+    "SIN TRAMO": "❓"
 }
 
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
@@ -63,9 +62,12 @@ if archivo:
             Fullscreen().add_to(mapa)
 
             if agrupacion == "Por Tramo":
-                # Crear grupos por tramo
+                # Crear grupos por tramo con emojis de reloj
                 tramos_unicos = df['Tramo'].unique()
-                grupos = {tramo: folium.FeatureGroup(name=f"🕒 {tramo}") for tramo in tramos_unicos}
+                grupos = {
+                    tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '🕒')} {tramo}")
+                    for tramo in tramos_unicos
+                }
                 grupo_key = 'Tramo'
             else:
                 # Crear grupos por técnico
@@ -76,18 +78,14 @@ if archivo:
                 key = row[grupo_key]
                 grupo = grupos[key]
                 
-                # Obtener imagen del técnico si existe
-                imagen_url = tecnico_imagenes.get(row['CodigoTecnico'], '')
-                imagen_html = f'<img src="{imagen_url}" width="100" height="100" style="border-radius: 10px;"><br>' if imagen_url else ''
-
+                # Texto del popup sin imagen
                 popup_text = f"""
-                {imagen_html}
                 <b>Código:</b> {row.get('Codigo', '')}<br>
                 <b>Cliente:</b> {row.get('Cliente', '')}<br>
                 <b>Dirección:</b> {row.get('Direccion', '')}<br>
                 <b>Distrito:</b> {row.get('Distrito', '')}<br>
                 <b>Negocio:</b> {row.get('Negocio', '')}<br>
-                <b>Estado:</b> {row.get('Estado', '')}<br>
+                <b>Estado:</b> {row.get('Estado2', '')}<br>
                 <b>Observaciones:</b> {row.get('Observaciones', '')}<br>
                 <b>Tramo:</b> {row.get('Tramo', '')}<br>
                 <b>Técnico:</b> {row.get('Tecnico', '')}<br>
