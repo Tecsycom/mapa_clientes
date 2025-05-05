@@ -22,11 +22,10 @@ colores = [
 
 # Diccionario para asociar emojis de reloj a tramos
 emoji_tramos = {
-    "08AM-12PM": "🕗",
-    "12PM-16PM": "🕛",
-    "16PM-20PM": "🕓",
-    "SIN TRAMO": "⏳"
-    '
+    '08AM-12PM': '🕗',  # Reloj a las 8:00
+    '12PM-16PM': '🕛',  # Reloj a las 12:00
+    '16PM-20PM': '🕓',   # Reloj a las 16:00
+    'Sin Tramo': '⏳'  # Emoji genérico para tramos no especificados
 }
 
 # Configuración de Google Sheets API
