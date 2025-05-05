@@ -32,7 +32,7 @@ emoji_tramos = {
 SPREADSHEET_ID = '1H4h18-bmIPe6k3UdjRZKqd7jsWE2pP5H'
 SHEET_NAME = 'MAPS'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-CREDENTIALS_FILE = 'credentials.json'
+CREDENTIALS_FILE = 'D:\\Credencial\\duplicados-431101-35a3b8678f62.json'
 TOKEN_FILE = 'token.json'
 
 def get_sheets_service():
