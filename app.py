@@ -11,7 +11,9 @@ st.title("📍 Mapa de Clientes Tecsycom PeruFibra")
 # Colores para técnicos
 colores = [
     'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
-    'pink', 'lightblue', 'beige', 'gray', 'black'
+    'pink', 'lightblue', 'beige', 'gray', 'black', 'lightgreen', 'darkblue', 'lightred',
+    'darkpurple', 'lightgray', 'darkorange', 'lightpurple', 'goldenrod', 'teal', 'maroon',
+    'olive', 'navy'
 ]
 
 # Diccionario para asociar emojis de reloj a tramos
@@ -65,7 +67,7 @@ if archivo:
                 # Crear grupos por tramo con emojis de reloj
                 tramos_unicos = df['Tramo'].unique()
                 grupos = {
-                    tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '📍')} {tramo}")
+                    tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '⏳')} {tramo}")
                     for tramo in tramos_unicos
                 }
                 grupo_key = 'Tramo'
