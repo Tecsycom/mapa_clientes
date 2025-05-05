@@ -3,3 +3,4 @@ pandas
 openpyxl
 folium
 streamlit-folium
+streamlit>=1.38.0 pandas>=2.2.3 openpyxl>=3.1.5 folium>=0.17.0 streamlit-folium>=0.22.0 google-auth>=2.0.0 google-api-python-client>=2.0.0
