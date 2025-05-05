@@ -4,7 +4,7 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
-from google.oauth2.credentials protagonistsimport Credentials
+from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -25,14 +25,14 @@ emoji_tramos = {
     '08AM-12PM': '🕗',  # Reloj a las 8:00
     '12PM-16PM': '🕛',  # Reloj a las 12:00
     '16PM-20PM': '🕓',   # Reloj a las 16:00
-    'Sin Tramo': '⏳'  # Emoji genérico para tramos no especificados
+    'SIN TRAMO': '⏳'  # Emoji genérico para tramos no especificados
 }
 
 # Configuración de Google Sheets API
 SPREADSHEET_ID = '1H4h18-bmIPe6k3UdjRZKqd7jsWE2pP5H'
 SHEET_NAME = 'MAPS'
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
-CREDENTIALS_FILE = 'D:\\Credencial\\duplicados-431101-35a3b8678f62.json'
+CREDENTIALS_FILE = 'credentials.json'
 TOKEN_FILE = 'token.json'
 
 def get_sheets_service():
