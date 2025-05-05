@@ -24,8 +24,8 @@ colores = [
 emoji_tramos = {
     '08AM-12PM': '🕗',  # Reloj a las 8:00
     '12PM-16PM': '🕛',  # Reloj a las 12:00
-    '16PM-20PM': '🕓',   # Reloj a las 16:00
-    'SIN TRAMO': '⏳'  # Emoji genérico para tramos no especificados
+    '16PM-20PM': '🕓',  # Reloj a las 16:00
+    'SIN TRAMO': '⏳'   # Emoji genérico para tramos no especificados
 }
 
 # Configuración de Google Sheets API
@@ -84,7 +84,7 @@ if archivo:
             df['Longitud'] = df['longitud_X'].astype(float)
             df['CodigoTecnico'] = df['Tecnico'].fillna('SIN_TECNICO').str.extract(r'(K\d+)')
             df['CodigoTecnico'].fillna('SIN_TECNICO', inplace=True)
-            df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
+            df['Tramo'] = df['Tramo'].fillna('SIN TRAMO')
 
             tecnicos = df['CodigoTecnico'].unique()
             color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
