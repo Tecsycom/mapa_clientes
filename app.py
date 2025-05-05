@@ -4,11 +4,15 @@ import folium
 from folium.plugins import Fullscreen
 from streamlit_folium import st_folium
 import os
+from google.oauth2.credentials protagonistsimport Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
+from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 st.set_page_config(layout="wide")
 st.title("📍 Mapa de Clientes Tecsycom PeruFibra")
 
-# Colores para técnicos
+# Colores expandidos para cubrir 25 técnicos
 colores = [
     'red', 'blue', 'green', 'orange', 'purple', 'darkred', 'cadetblue', 'darkgreen',
     'pink', 'lightblue', 'beige', 'gray', 'black', 'lightgreen', 'darkblue', 'lightred',
@@ -21,9 +25,47 @@ emoji_tramos = {
     "08AM-12PM": "🕗",
     "12PM-16PM": "🕛",
     "16PM-20PM": "🕓",
-    "SIN TRAMO": "❓"
+    "SIN TRAMO": "⏳"
+    '
 }
 
+# Configuración de Google Sheets API
+SPREADSHEET_ID = '1H4h18-bmIPe6k3UdjRZKqd7jsWE2pP5H'
+SHEET_NAME = 'MAPS'
+SCOPES = ['https://www.googleapis.com/auth/spreadsheets']
+CREDENTIALS_FILE = 'credentials.json'
+TOKEN_FILE = 'token.json'
+
+def get_sheets_service():
+    creds = None
+    if os.path.exists(TOKEN_FILE):
+        creds = Credentials.from_authorized_user_file(TOKEN_FILE, SCOPES)
+    if not creds or not creds.valid:
+        flow = InstalledAppFlow.from_client_secrets_file(CREDENTIALS_FILE, SCOPES)
+        creds = flow.run_local_server(port=0)
+        with open(TOKEN_FILE, 'w') as token:
+            token.write(creds.to_json())
+    return build('sheets', 'v4', credentials=creds)
+
+def update_google_sheet(spreadsheet_id, sheet_name, data):
+    try:
+        service = get_sheets_service()
+        # Convertir el DataFrame a una lista de listas
+        values = [data.columns.tolist()] + data.values.tolist()
+        body = {'values': values}
+        # Usar el nombre de la hoja (MAPS!A1)
+        range_name = f"{sheet_name}!A1"
+        result = service.spreadsheets().values().update(
+            spreadsheetId=spreadsheet_id,
+            range=range_name,
+            valueInputOption='RAW',
+            body=body
+        ).execute()
+        st.success(f"Hoja de Google Sheets 'MAPS' actualizada: {result.get('updatedCells')} celdas modificadas")
+    except HttpError as e:
+        st.error(f"Error al actualizar Google Sheets: {e}")
+
+# Interfaz de Streamlit
 archivo = st.file_uploader("📂 Sube tu archivo Excel con coordenadas", type=[".xlsx", ".xls"])
 
 if archivo:
@@ -35,36 +77,31 @@ if archivo:
         if not all(col in df.columns for col in columnas_requeridas):
             st.error(f"❌ El archivo debe contener las columnas: {', '.join(columnas_requeridas)}")
         else:
-            # Asignar latitud y longitud
+            # Actualizar Google Sheets
+            update_google_sheet(SPREADSHEET_ID, SHEET_NAME, df)
+
+            # Procesamiento para el mapa
             df['Latitud'] = df['latitud_Y'].astype(float)
             df['Longitud'] = df['longitud_X'].astype(float)
-
-            # Extraer código de técnico, si existe
             df['CodigoTecnico'] = df['Tecnico'].fillna('SIN_TECNICO').str.extract(r'(K\d+)')
             df['CodigoTecnico'].fillna('SIN_TECNICO', inplace=True)
-            
-            # Asignar tramo si está vacío
             df['Tramo'] = df['Tramo'].fillna('Sin Tramo')
 
-            # Colores únicos por técnico
             tecnicos = df['CodigoTecnico'].unique()
             color_map = {tec: colores[i % len(colores)] for i, tec in enumerate(tecnicos)}
 
-            # Selección de tipo de agrupación
             agrupacion = st.radio(
                 "📊 Selecciona el tipo de agrupación:",
                 ["Por Tramo", "Por Técnico"],
                 horizontal=True
             )
 
-            # Crear mapa
             lat_mean = df['Latitud'].mean()
             lon_mean = df['Longitud'].mean()
             mapa = folium.Map(location=[lat_mean, lon_mean], zoom_start=13)
             Fullscreen().add_to(mapa)
 
             if agrupacion == "Por Tramo":
-                # Crear grupos por tramo con emojis de reloj
                 tramos_unicos = df['Tramo'].unique()
                 grupos = {
                     tramo: folium.FeatureGroup(name=f"{emoji_tramos.get(tramo, '⏳')} {tramo}")
@@ -72,7 +109,6 @@ if archivo:
                 }
                 grupo_key = 'Tramo'
             else:
-                # Crear grupos por técnico
                 grupos = {tec: folium.FeatureGroup(name=f"👷 {tec}") for tec in tecnicos}
                 grupo_key = 'CodigoTecnico'
 
@@ -80,7 +116,6 @@ if archivo:
                 key = row[grupo_key]
                 grupo = grupos[key]
                 
-                # Texto del popup sin imagen
                 popup_text = f"""
                 <b>Código:</b> {row.get('Codigo', '')}<br>
                 <b>Cliente:</b> {row.get('Cliente', '')}<br>
@@ -111,7 +146,6 @@ if archivo:
                     )
                 ).add_to(grupo)
 
-            # Agregar todos los grupos al mapa
             for capa in grupos.values():
                 mapa.add_child(capa)
 
